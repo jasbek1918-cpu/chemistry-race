@@ -1,0 +1,152 @@
+{
+  "settings": {
+    "title": "CHEMISTRY RACE",
+    "school": "Kimyo fani",
+    "defaultTime": 20,
+    "speedBonus": 5,
+    "streakBonus": 25
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "topic": "Molyar massa",
+      "q": "H₂O ning nisbiy molekulyar massasi nechaga teng?",
+      "options": [
+        "16",
+        "18",
+        "20",
+        "22"
+      ],
+      "answer": 1,
+      "difficulty": "Oson",
+      "points": 100
+    },
+    {
+      "id": "q2",
+      "topic": "Bog‘lanish",
+      "q": "NaCl qanday kimyoviy bog‘lanishga ega?",
+      "options": [
+        "Ion",
+        "Kovalent qutbsiz",
+        "Metall",
+        "Vodorod"
+      ],
+      "answer": 0,
+      "difficulty": "Oson",
+      "points": 100
+    },
+    {
+      "id": "q3",
+      "topic": "Molyar massa",
+      "q": "H₂SO₄ ning molyar massasi qancha?",
+      "options": [
+        "96 g/mol",
+        "98 g/mol",
+        "100 g/mol",
+        "102 g/mol"
+      ],
+      "answer": 1,
+      "difficulty": "O‘rta",
+      "points": 100
+    },
+    {
+      "id": "q4",
+      "topic": "Oksidlanish darajasi",
+      "q": "O₂ molekulasida kislorodning oksidlanish darajasi nechaga teng?",
+      "options": [
+        "+2",
+        "−2",
+        "0",
+        "+1"
+      ],
+      "answer": 2,
+      "difficulty": "Oson",
+      "points": 100
+    },
+    {
+      "id": "q5",
+      "topic": "Mol",
+      "q": "1 mol modda taxminan nechta zarrachadan iborat?",
+      "options": [
+        "6.02×10²³",
+        "3.01×10²³",
+        "9.81×10²³",
+        "1.00×10²³"
+      ],
+      "answer": 0,
+      "difficulty": "Oson",
+      "points": 100
+    },
+    {
+      "id": "q6",
+      "topic": "pH",
+      "q": "pH = 7 bo‘lgan eritma qanday muhitga ega?",
+      "options": [
+        "Kislotali",
+        "Neytral",
+        "Ishqoriy",
+        "Faqat tuzli"
+      ],
+      "answer": 1,
+      "difficulty": "Oson",
+      "points": 100
+    },
+    {
+      "id": "q7",
+      "topic": "Oksidlar",
+      "q": "CO₂ ning nomi qaysi?",
+      "options": [
+        "Uglerod(II) oksid",
+        "Uglerod(IV) oksid",
+        "Karbonat kislota",
+        "Kalsiy oksid"
+      ],
+      "answer": 1,
+      "difficulty": "Oson",
+      "points": 100
+    },
+    {
+      "id": "q8",
+      "topic": "Organik kimyo",
+      "q": "Alkanlarning umumiy formulasi?",
+      "options": [
+        "CₙH₂ₙ",
+        "CₙH₂ₙ₋₂",
+        "CₙH₂ₙ₊₂",
+        "CₙHₙ"
+      ],
+      "answer": 2,
+      "difficulty": "O‘rta",
+      "points": 100
+    },
+    {
+      "id": "q9",
+      "topic": "Noorganik kimyo",
+      "q": "NaOH qanday modda?",
+      "options": [
+        "Kislota",
+        "Asos",
+        "Tuz",
+        "Oksid"
+      ],
+      "answer": 1,
+      "difficulty": "Oson",
+      "points": 100
+    },
+    {
+      "id": "q10",
+      "topic": "Redoks",
+      "q": "Elektron berish jarayoni nima deyiladi?",
+      "options": [
+        "Qaytarilish",
+        "Oksidlanish",
+        "Neytrallanish",
+        "Gidroliz"
+      ],
+      "answer": 1,
+      "difficulty": "O‘rta",
+      "points": 100
+    }
+  ],
+  "history": []
+}

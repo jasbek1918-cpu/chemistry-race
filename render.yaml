@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: chemistry-race
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22

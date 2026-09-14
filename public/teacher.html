@@ -1,0 +1,86 @@
+<!doctype html><html lang="uz"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Chemistry Race Pro</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap');
+*{box-sizing:border-box}body{margin:0;font-family:Rajdhani,Arial,sans-serif;background:radial-gradient(circle at 10% 0,#153b6c,#07111e 52%,#02060b);color:#17324d}.wrap{max-width:1350px;margin:auto;padding:20px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:900px){.grid{grid-template-columns:1fr}}.card{background:linear-gradient(145deg,#ffffffee,#f2fbffdd);border:1px solid #7bdcff;border-radius:20px;padding:18px;box-shadow:0 0 28px #00b7ff16;margin-bottom:16px}.top{display:flex;justify-content:space-between;align-items:center;gap:10px}.logo{font-size:34px;letter-spacing:3px;color:#087fc1;font-weight:700}.muted{color:#55748c}h2{margin-top:0}.controls{display:grid;grid-template-columns:1fr 110px 150px;gap:9px}@media(max-width:650px){.controls{grid-template-columns:1fr}}input,textarea,select,button{padding:12px;border-radius:11px;border:1px solid #2d668f;background:#ffffff;color:#17324d;font:600 15px Rajdhani}button{cursor:pointer;background:linear-gradient(90deg,#00a9ff,#6c5cff);border:0}.danger{background:#d83b55}.green{background:#149b72}.gold{background:#b77a11}.list{max-height:420px;overflow:auto}.student{display:grid;grid-template-columns:58px 1fr 100px 110px;gap:8px;align-items:center;padding:13px 5px;border-bottom:1px solid #18354c}.rank{font-size:26px;font-weight:700}.score{font-size:20px;font-weight:700;color:#c67a00}.qtext{font-size:23px;font-weight:700;line-height:1.3}.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.pill{display:inline-block;padding:7px 10px;border-radius:999px;background:#e4f7ff;color:#0873a9}.item{border:1px solid #214762;padding:10px;border-radius:12px;margin:7px 0}.actions{display:flex;gap:6px;margin-top:8px}.actions button{padding:8px}.form{display:grid;gap:8px}.check{accent-color:#1bb7ff}.hero{font-size:45px;text-align:center;color:#087fc1}.mini{font-size:12px}.meter{height:8px;border-radius:10px;background:#0b1d2d;overflow:hidden}.meter i{display:block;height:100%;background:linear-gradient(90deg,#00c8ff,#8b5cff);width:70%}
+.bg-orbs{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:-1}.orb{position:absolute;border-radius:50%;filter:blur(2px);opacity:.35;animation:float 10s ease-in-out infinite}.orb:nth-child(1){width:130px;height:130px;left:5%;top:12%;background:#6fe4ff}.orb:nth-child(2){width:180px;height:180px;right:8%;top:35%;background:#ffd76a;animation-delay:2s}.orb:nth-child(3){width:100px;height:100px;left:45%;bottom:4%;background:#a98cff;animation-delay:4s}@keyframes float{50%{transform:translate(20px,-25px) scale(1.12)}}.flash{animation:flash .55s}@keyframes flash{50%{transform:scale(1.05);box-shadow:0 0 35px #49d8ff}}.progress{height:9px;background:#dcecf4;border-radius:10px;overflow:hidden}.progress i{display:block;height:100%;background:linear-gradient(90deg,#1cc8ff,#7c63ff,#ffbf3c);transition:width .3s}
+
+.race-card{background:linear-gradient(135deg,#07172b,#0d2d4b);border:1px solid #20c8ff55;color:white;box-shadow:0 15px 45px #00132255}.race-title{display:flex;justify-content:space-between;align-items:center;gap:12px}.race-actions{display:flex;align-items:center;gap:8px}.race-start{cursor:pointer;color:#17324d!important;background:linear-gradient(90deg,#2fe0a1,#36b8ff)!important;border:0!important;font-weight:700}.race-title h2{margin:0;color:#fff}.track{margin-top:14px;display:grid;gap:8px}.lane{position:relative;height:58px;border-radius:15px;background:linear-gradient(90deg,#12314b,#0a1d30);border:1px solid #ffffff16;overflow:hidden}.lane:after{content:"";position:absolute;left:0;right:0;top:50%;border-top:2px dashed #ffffff1c}.runner{position:absolute;top:7px;left:0;z-index:2;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#ffd65c,#ff8b35);box-shadow:0 0 20px #ffb83d88;font-size:23px;transition:left .55s cubic-bezier(.2,.8,.2,1)}.lane-name{position:absolute;left:58px;top:7px;z-index:3;font-weight:700;color:#dff7ff}.lane-score{position:absolute;right:12px;top:8px;z-index:3;font-weight:700;color:#7fe8ff}.finishline{position:absolute;right:5%;top:0;bottom:0;border-left:4px solid #fff;opacity:.55}.student{transition:.25s}.student:first-child{background:linear-gradient(90deg,#fffbe8,#fff)}
+@media(max-width:700px){.race-title{flex-direction:column;align-items:flex-start}}
+<style>
+.sharebox{background:linear-gradient(135deg,#e9fbff,#f6efff);border:2px solid #62d7ff;border-radius:18px;padding:14px;margin-top:12px}.sharegrid{display:grid;grid-template-columns:180px 1fr;gap:16px;align-items:center}@media(max-width:600px){.sharegrid{grid-template-columns:1fr}}#qrcode{background:white;padding:10px;border-radius:12px;width:160px;height:160px;display:grid;place-items:center}.shareurl{word-break:break-all;background:white;border:1px solid #9bdcf2;padding:10px;border-radius:10px}.sharebtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.copyok{color:#087f5b;font-weight:700}.gamecode{font-size:24px;font-weight:700;letter-spacing:3px;color:#6c5cff}</style></head><body><div class="bg-orbs"><i class="orb"></i><i class="orb"></i><i class="orb"></i></div><div class="wrap">
+<div class="card top"><div><div class="logo">⚛️ CHEMISTRY RACE PRO</div><div class="muted">O‘qituvchi boshqaruv paneli · jonli sinf o‘yini</div></div><span class="pill" id="conn">🔴 Ulanmoqda</span></div>
+<div class="grid">
+<div class="card"><h2>🎮 O‘yinni yaratish</h2><div id="picker" class="list"></div><br><div class="controls"><input id="title" value="CHEMISTRY RACE"><input id="time" type="number" value="20" min="5" max="180"><button onclick="createGame()">YANGI O‘YIN</button></div><p class="mini muted">Savol belgilanmasa, barcha savollar ishlatiladi.</p><button class="green" onclick="nextQ()">▶ KEYINGI SAVOL / BOSHLASH</button> <button class="danger" onclick="stop()">⏹ TO‘XTATISH</button><br><br><button class="gold" onclick="resetGame()">↺ O‘YINNI YAKUNLASH</button></div>
+<div class="card"><div class="hero">⚗️</div><h2>Hozirgi topshiriq</h2><div id="current" class="qtext">O‘yin yaratilmagan.</div><div id="opts" class="opts"></div></div>
+</div>
+<div class="card race-card"><div class="race-title"><h2>🏁 LIVE CHEMISTRY RACE</h2><div class="race-actions"><span class="pill" id="raceStatus">STARTGA TAYYOR</span><button class="race-start" onclick="nextQ()">🚀 START / KEYINGI SAVOL</button></div></div><div id="raceTrack" class="track"></div></div>
+<div class="card sharebox"><div class="top"><div><h2 style="margin:0">📱 O‘QUVCHILARNI ULANISH</h2><div class="muted">QR-kod yoki Telegram orqali yuboriladigan havola. Internet rejimida o‘quvchi boshqa Wi‑Fi'da ham kira oladi.</div></div><span class="gamecode" id="gameCode">—</span></div><div class="sharegrid"><div id="qrcode"><span class="muted">O‘yin yarating</span></div><div><b>1) QR-kodni skaner qildiring</b><p class="mini muted">Telefon kamerasi bilan skaner → o‘quvchi nomini yozadi → o‘yinga kiradi.</p><b>2) Telegramga havola yuboring</b><div id="shareUrl" class="shareurl">Avval “YANGI O‘YIN” tugmasini bosing.</div><div class="sharebtns"><button class="green" onclick="makeShare()">🌐 INTERNET HAVOLA + QR</button><button onclick="copyShare()">📋 HAVOLANI NUSXALASH</button><button onclick="telegramShare()">✈️ TELEGRAMGA YUBORISH</button></div><div id="shareMsg" class="mini"></div></div></div></div>
+<div class="card"><div class="top"><h2>🏆 JONLI REYTING</h2><span class="pill" id="count">0 o‘quvchi</span></div><div id="ranking" class="list"></div></div>
+<div class="grid">
+<div class="card"><h2>🧪 SAVOLLAR BAZASI</h2><div class="form"><input id="editId" type="hidden"><input id="topic" placeholder="Mavzu"><textarea id="q" rows="2" placeholder="Savol matni"></textarea><input id="a0" placeholder="A javob"><input id="a1" placeholder="B javob"><input id="a2" placeholder="C javob"><input id="a3" placeholder="D javob"><div class="controls"><select id="ans"><option value="0">To‘g‘ri: A</option><option value="1">To‘g‘ri: B</option><option value="2">To‘g‘ri: C</option><option value="3">To‘g‘ri: D</option></select><select id="diff"><option>Oson</option><option>O‘rta</option><option>Qiyin</option></select><input id="points" type="number" value="100"></div><button onclick="saveQ()">💾 SAQLASH</button><button onclick="clearForm()">Tozalash</button></div><hr><div id="questions" class="list"></div></div>
+<div class="card"><h2>⚙️ SOZLAMALAR</h2><div class="form"><input id="school" placeholder="Maktab / fan"><input id="defTime" type="number" placeholder="Standart vaqt"><input id="bonus" type="number" placeholder="Tezlik bonusi"><input id="streak" type="number" placeholder="Combo bonusi"><button onclick="saveSettings()">Sozlamalarni saqlash</button><button onclick="exportQ()">⬇ SAVOLLARNI JSON QILISH</button><button onclick="exportR()">⬇ NATIJALARNI CSV QILISH</button></div><hr><h3>📥 KO‘P SAVOL IMPORT</h3>
+<input id="file" type="file" accept=".docx,.txt,.csv,.rtf,.json">
+<button onclick="importQ()">📄 WORD / TXT / CSV IMPORT</button>
+<button onclick="importJSON()">JSON import</button>
+<a href="/question_template.docx" download style="display:inline-block;margin-top:8px;color:#087fc1">📘 Word shablonini olish</a><p class="mini muted">Savollar doimiy ravishda data/database.json fayliga saqlanadi.</p></div>
+</div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script>
+let ws;
+let shareUrl="";
+const $=x=>document.getElementById(x);
+async function api(u,o){const r=await fetch(u,o);const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Xatolik");return d}
+async function load(){const qs=await api("/api/questions");renderPicker(qs);renderQuestions(qs);const s=await api("/api/state");setSettings(s.settings)}
+function connect(){ws=new WebSocket((location.protocol==="https:"?"wss://":"ws://")+location.host);ws.onopen=()=>$("conn").textContent="🟢 ULANGAN";ws.onclose=()=>$("conn").textContent="🔴 UZILGAN";ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==="state")render(m.data)}}
+function render(d){
+  $("count").textContent=d.players.length+" o‘quvchi";
+  $("gameCode").textContent=d.game.id?d.game.id.slice(-6).toUpperCase():"—";
+  $("ranking").innerHTML=d.players.length?d.players.map((s,i)=>`<div class="student"><div class="rank">${i<3?["🥇","🥈","🥉"][i]:s.rank}</div><div><b>${esc(s.name)}</b><div class="mini muted">✅ ${s.correct} · ❌ ${s.wrong}${s.answerTime!=null?" · "+s.answerTime.toFixed(1)+" s":""}${s.streak>=3?" · 🔥 COMBO x"+s.streak:""}</div></div><div class="score">${s.score} XP</div><div class="mini">${s.answered?"✓ Javob berdi":"⏳ Kutmoqda"}</div></div>`).join(""):"<p class='muted'>Hali o‘quvchi ulanmagan.</p>";
+  $("current").textContent=d.game.question?d.game.question.q:(d.game.id?"Keyingi savolni boshlang.":"O‘yin yaratilmagan.");
+  $("opts").innerHTML=d.game.question?d.game.question.options.map((x,i)=>`<div class="pill">${String.fromCharCode(65+i)}) ${esc(x)}</div>`).join(""):"";
+  $("raceStatus").textContent=d.game.running?`🏎️ SAVOL ${d.game.questionNo}/${d.game.total}`:(d.game.questionNo>=d.game.total&&d.game.total?"🏁 FINISH":"STARTGA TAYYOR");
+  const icons=['🧪','⚛️','🔬','🧬','⚗️','💡','🧠','🚀'];
+  $("raceTrack").innerHTML=d.players.length?d.players.map((p,i)=>{let pct=d.game.total?Math.min(92,Math.max(4,((d.game.questionNo-1)/Math.max(1,d.game.total))*78+(p.answered?14:4))):4;return `<div class="lane"><div class="finishline"></div><div class="runner" style="left:${pct}%">${icons[i%icons.length]}</div><div class="lane-name">${esc(p.name)} <span style="opacity:.65">#${p.rank}</span></div><div class="lane-score">${p.score} XP</div></div>`}).join(''):`<div class="muted" style="color:#b9dbea">O‘quvchilar telefonidan kirganda poyga shu yerda jonli ko‘rinadi.</div>`;
+  if(d.game.running) document.title='🏁 LIVE · Chemistry Race'; else document.title='Chemistry Race Pro';
+}
+function renderPicker(qs){$("picker").innerHTML=qs.map(q=>`<label class="item" style="display:block"><input class="check pick" type="checkbox" value="${q.id}"> <b>${esc(q.q)}</b><span class="mini muted"> — ${esc(q.topic)} · ${q.difficulty}</span></label>`).join("")}
+function renderQuestions(qs){$("questions").innerHTML=qs.map(q=>`<div class="item"><b>${esc(q.q)}</b><div class="mini muted">${esc(q.topic)} · ${q.difficulty} · ${q.points} ball · To‘g‘ri ${String.fromCharCode(65+q.answer)}</div><div class="actions"><button onclick='editQ(${JSON.stringify(q)})'>Tahrirlash</button><button class="danger" onclick="delQ('${q.id}')">O‘chirish</button></div></div>`).join("")}
+async function createGame(){let ids=[...document.querySelectorAll(".pick:checked")].map(x=>x.value);try{await api("/api/game/start",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({questionIds:ids,title:$("title").value,timeLimit:+$("time").value})});shareUrl="";$("shareUrl").textContent="Yangi o‘yin uchun “INTERNET HAVOLA + QR” tugmasini bosing.";$("qrcode").innerHTML='<span class="muted">Yangi o‘yin uchun QR yarating</span>';$("shareMsg").textContent=""}catch(e){alert(e.message)}}
+async function nextQ(){try{await api("/api/game/next",{method:"POST"})}catch(e){alert(e.message)}}
+async function makeShare(){
+ try{
+  const d=await api("/api/share"); shareUrl=d.studentUrl;
+  $("shareUrl").textContent=shareUrl; $("shareMsg").textContent="✓ Internet havola tayyor — Telegramga yuborishingiz mumkin.";
+  $("qrcode").innerHTML=""; new QRCode($("qrcode"),{text:shareUrl,width:140,height:140,correctLevel:QRCode.CorrectLevel.M});
+ }catch(e){alert(e.message)}
+}
+async function copyShare(){
+ if(!shareUrl) await makeShare();
+ if(shareUrl){await navigator.clipboard.writeText(shareUrl);$("shareMsg").textContent="✓ Havola nusxalandi. Telegramga yuboring.";}
+}
+async function telegramShare(){
+ if(!shareUrl) await makeShare();
+ if(!shareUrl) return;
+ const text=encodeURIComponent("🧪 CHEMISTRY RACE\n🏁 O‘yinga qo‘shiling: "+shareUrl);
+ window.open("https://t.me/share/url?url="+encodeURIComponent(shareUrl)+"&text="+text,"_blank");
+}
+async function stop(){await api("/api/game/stop",{method:"POST"})}
+async function resetGame(){if(confirm("O‘yinni yakunlaysizmi?"))await api("/api/game/reset",{method:"POST"})}
+async function saveQ(){let body={id:$("editId").value||undefined,topic:$("topic").value,q:$("q").value,options:[$("a0").value,$("a1").value,$("a2").value,$("a3").value],answer:+$("ans").value,difficulty:$("diff").value,points:+$("points").value};try{await api("/api/questions",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});clearForm();load();alert("✓ Savol saqlandi")}catch(e){alert(e.message)}}
+function editQ(q){$("editId").value=q.id;$("topic").value=q.topic;$("q").value=q.q;q.options.forEach((x,i)=>$("a"+i).value=x);$("ans").value=q.answer;$("diff").value=q.difficulty;$("points").value=q.points;scrollTo(0,document.body.scrollHeight)}
+async function delQ(id){if(confirm("Savolni o‘chirasizmi?")){await api("/api/questions/"+id,{method:"DELETE"});load()}}
+function clearForm(){["editId","topic","q","a0","a1","a2","a3"].forEach(x=>$(x).value="");$("ans").value=0;$("diff").value="Oson";$("points").value=100}
+function setSettings(s){$("school").value=s.school||"";$("defTime").value=s.defaultTime;$("bonus").value=s.speedBonus;$("streak").value=s.streakBonus}
+async function saveSettings(){await api("/api/settings",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({school:$("school").value,defaultTime:+$("defTime").value,speedBonus:+$("bonus").value,streakBonus:+$("streak").value})});alert("✓ Sozlamalar saqlandi")}
+function exportQ(){location="/api/questions/export"}function exportR(){location="/api/results/export"}
+async function importQ(){
+ const f=$("file").files[0]; if(!f)return alert("Fayl tanlang.");
+ if(f.name.toLowerCase().endsWith(".json")) return importJSON();
+ const fd=new FormData();fd.append("file",f);
+ try{const r=await fetch("/api/questions/import-file",{method:"POST",body:fd});const d=await r.json();if(!r.ok)throw Error(d.error);alert("✓ "+d.count+" ta savol import qilindi.");load()}catch(e){alert(e.message)}
+}
+async function importJSON(){
+ const f=$("file").files[0];if(!f)return alert("JSON fayl tanlang.");
+ try{const x=JSON.parse(await f.text());const r=await api("/api/questions/import",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(x)});alert("✓ "+r.count+" ta savol qo‘shildi.");load()}catch(e){alert(e.message)}
+}
+function esc(x){return String(x).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+load();connect();
+</script></body></html>
