@@ -10,18 +10,43 @@
 <div class="card"><div class="stats"><span class="badge">🏆 O‘rin: <b id="rank">—</b></span><span class="streak">🔥 COMBO <b id="streak">0</b></span><span class="badge">🎯 <b id="accuracy">0</b>%</span></div><br><div class="progress"><i id="bar" style="width:0%"></i></div></div>
 <div id="playcard" class="card"><div class="racehead"><div class="timer" id="timer">—</div><div id="state" class="badge">KUTISH</div></div><div class="question" id="question">O‘qituvchi o‘yinni boshlashini kuting...</div><div id="options"></div><div id="feedback"></div></div></div>
 </div><script>
-let ws,id,deadline=0,answered=false,lastQ=0,lastScore=0,audioCtx=null; const GAME_ID=new URLSearchParams(location.search).get("game")||"";
+let ws,id,deadline=0,answered=false,lastQ=0,lastScore=0,audioCtx=null,tickTimer=null,lastTick=0; const SESSION_KEY="chemistryRaceSession_"+(new URLSearchParams(location.search).get("game")||"public"); let session=localStorage.getItem(SESSION_KEY)||""; const GAME_ID=new URLSearchParams(location.search).get("game")||"";
 function sound(type){try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.connect(g);g.connect(audioCtx.destination);o.frequency.value=type==='ok'?720:type==='bad'?180:type==='tick'?520:390;o.type='sine';g.gain.setValueAtTime(.0001,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.06,audioCtx.currentTime+.02);g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+.16);o.start();o.stop(audioCtx.currentTime+.18)}catch(e){}}
-function connect(){ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host);ws.onmessage=e=>{const m=JSON.parse(e.data);if(m.type==='joined'){id=m.data.id;$('hello').textContent=m.data.name;sound('join')}else if(m.type==='joinError'){alert(m.data.message);location.reload()}else if(m.type==='state')render(m.data)}}
-function join(){const n=$('name').value.trim();if(!n)return alert('Ismingizni kiriting.');audioCtx=new(window.AudioContext||window.webkitAudioContext)();document.getElementById('join').classList.add('hide');document.getElementById('game').classList.remove('hide');connect();setTimeout(()=>ws.send(JSON.stringify({type:'join',name:n,gameId:GAME_ID})),250)}
+function connect(){
+ ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host);
+ ws.onopen=()=>{const n=$("name").value.trim(); if(n) ws.send(JSON.stringify({type:"join",name:n,gameId:GAME_ID,session}));};
+ ws.onmessage=e=>{const m=JSON.parse(e.data);
+   if(m.type==='joined'){id=m.data.id;session=m.data.session||session;localStorage.setItem(SESSION_KEY,session);$("hello").textContent=m.data.name;sound('join');}
+   else if(m.type==='joinError'){alert(m.data.message);}
+   else if(m.type==='state')render(m.data);
+ };
+ ws.onclose=()=>{setTimeout(()=>{if($("game")&&!$("game").classList.contains('hide'))connect()},1500)};
+}
+function join(){
+ const n=$("name").value.trim(); if(!n)return alert('Ismingizni kiriting.');
+ audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+ $("join").classList.add('hide');$("game").classList.remove('hide');connect();
+}
 const $=x=>document.getElementById(x);
-function render(d){const me=d.players.find(x=>x.id===id);if(me){$('score').textContent=me.score;$('rank').textContent=me.rank;$('streak').textContent=me.streak;$('accuracy').textContent=Math.round(me.correct/Math.max(1,me.correct+me.wrong)*100);$('level').textContent='LVL '+(1+Math.floor(me.score/500));if(me.score>lastScore){$('score').classList.add('pulse');setTimeout(()=>$('score').classList.remove('pulse'),600);lastScore=me.score}}
-$('qn').textContent=d.game.questionNo?d.game.questionNo+'/'+d.game.total:'—';$('bar').style.width=d.game.total?((d.game.questionNo/d.game.total)*100)+'%':'0%';
-if(d.game.questionNo!==lastQ&&d.game.question){lastQ=d.game.questionNo;answered=false;showCountdown()}
-if(!d.game.running||!d.game.question){$('question').innerHTML=d.game.questionNo>=d.game.total&&d.game.total?'<div class="finish"><div class="big">🏆</div>RACE YAKUNLANDI!</div>':'O‘qituvchi keyingi savolni boshlashini kuting...';$('options').innerHTML='';$('state').textContent=d.game.questionNo>=d.game.total?'FINISH':'KUTISH';$('timer').textContent='—';return}
-answered=!!me?.answered;deadline=d.game.startedAt+d.game.timeLimit*1000;$('question').textContent=d.game.question.q;$('state').textContent=answered?'JAVOB QABUL QILINDI':'JAVOBNI TANLANG';$('options').innerHTML=d.game.question.options.map((x,i)=>`<button class="option" ${answered?'disabled':''} onclick="answer(${i})"><b>${String.fromCharCode(65+i)}</b>) ${esc(x)}</button>`).join('');tick()}
-function tick(){const s=Math.max(0,Math.ceil((deadline-Date.now())/1000));$('timer').textContent=s+' s';if(s<=5&&s>0&&!answered)sound('tick');if(s>0&&!answered)setTimeout(tick,250)}
-function answer(i){if(answered)return;answered=true;sound('ok');ws.send(JSON.stringify({type:'answer',answer:i}));$('feedback').innerHTML='<div class="msg pulse">⚡ Javob qabul qilindi! Tezlik bonusi hisoblanmoqda...</div>';$('playcard').classList.add('flash');setTimeout(()=>$('playcard').classList.remove('flash'),600);document.querySelectorAll('.option').forEach(b=>b.disabled=true);burst()}
+function render(d){
+ const me=d.players.find(x=>x.id===id);
+ if(me){$("score").textContent=me.score;$("rank").textContent=me.rank;$("streak").textContent=me.streak;$("accuracy").textContent=Math.round(me.correct/Math.max(1,me.correct+me.wrong)*100);$("level").textContent='LVL '+(1+Math.floor(me.score/500));if(me.score>lastScore){$("score").classList.add('pulse');setTimeout(()=>$("score").classList.remove('pulse'),600);lastScore=me.score}}
+ $("qn").textContent=d.game.questionNo?d.game.questionNo+'/'+d.game.total:'—';$("bar").style.width=d.game.total?((d.game.questionNo/d.game.total)*100)+'%':'0%';
+ if(d.game.questionNo!==lastQ&&d.game.question){lastQ=d.game.questionNo;answered=false;showCountdown();}
+ if(!d.game.running||!d.game.question){
+   $("question").innerHTML=d.game.questionNo>=d.game.total&&d.game.total?'<div class="finish"><div class="big">🏆</div>RACE YAKUNLANDI!</div>':'⏳ Keyingi savol tayyorlanmoqda...';
+   $("options").innerHTML='';$("state").textContent=d.game.questionNo>=d.game.total?'FINISH':'KEYINGI SAVOL TAYYORLANMOQDA';$("timer").textContent='—';return;
+ }
+ answered=!!me?.answered;deadline=d.game.startedAt+d.game.timeLimit*1000;$("question").textContent=d.game.question.q;$("state").textContent=answered?'JAVOB QABUL QILINDI':'JAVOBNI TANLANG';
+ $("options").innerHTML=d.game.question.options.map((x,i)=>`<button class="option" ${answered?'disabled':''} onclick="answer(${i})"><b>${String.fromCharCode(65+i)}</b>) ${esc(x)}</button>`).join('');tick();
+}
+function tick(){
+ if(tickTimer)clearTimeout(tickTimer);
+ const s=Math.max(0,Math.ceil((deadline-Date.now())/1000));$("timer").textContent=s+' s';
+ if(s<=5&&s>0&&!answered&&s!==lastTick){sound('tick');lastTick=s;}
+ if(s>0&&!answered)tickTimer=setTimeout(tick,250);
+}
+function answer(i){if(answered)return;answered=true;sound('ok');if(ws&&ws.readyState===1)ws.send(JSON.stringify({type:'answer',answer:i}));$('feedback').innerHTML='<div class="msg pulse">⚡ Javob qabul qilindi! Tezlik bonusi hisoblanmoqda...</div>';$('playcard').classList.add('flash');setTimeout(()=>$('playcard').classList.remove('flash'),600);document.querySelectorAll('.option').forEach(b=>b.disabled=true);burst()}
 function showCountdown(){const c=$('countdown');let n=3;c.textContent=n;c.classList.add('show');const t=setInterval(()=>{n--;if(n>0){c.textContent=n;sound('tick')}else{clearInterval(t);c.classList.remove('show')}} ,700)}
 function burst(){const p=$('particles');['⚛️','⚡','🧪','✨','🏁'].forEach((x,i)=>{const e=document.createElement('span');e.className='particle';e.textContent=x;e.style.left=(40+Math.random()*20)+'%';e.style.top=(42+Math.random()*15)+'%';e.style.setProperty('--dx',((Math.random()-.5)*260)+'px');e.style.setProperty('--dy',(-80-Math.random()*180)+'px');p.appendChild(e);setTimeout(()=>e.remove(),950)})}
 function esc(x){return String(x).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
