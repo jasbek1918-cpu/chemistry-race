@@ -17,12 +17,12 @@ function save(){fs.writeFileSync(DB,JSON.stringify(db,null,2),"utf8")}
 function load(){
  try{return JSON.parse(fs.readFileSync(DB,"utf8"))}
  catch(e){
-  const d={settings:{title:"CHEMISTRY RACE",school:"Kimyo fani",defaultTime:20,speedBonus:5,streakBonus:25},questions:defaults,history:[]};
+  const d={settings:{title:"CHEMISTRY RACE",school:"Kimyo fani",defaultTime:30,speedBonus:5,streakBonus:25},questions:defaults,history:[]};
   fs.writeFileSync(DB,JSON.stringify(d,null,2),"utf8"); return d;
  }
 }
 let db=load();
-const game={id:null,title:"CHEMISTRY RACE",running:false,question:null,questionNo:0,total:0,timeLimit:20,startedAt:0,list:[],players:new Map()};
+const game={id:null,title:"CHEMISTRY RACE",running:false,question:null,questionNo:0,total:0,timeLimit:30,startedAt:0,list:[],players:new Map(),advanceTimer:null};
 
 function publicState(){
  return {game:{id:game.id,title:game.title,running:game.running,
@@ -43,14 +43,23 @@ wss.on("connection",ws=>{
    const m=JSON.parse(raw);
    if(m.type==="join"){
     if(m.gameId && game.id && String(m.gameId)!==String(game.id)) { send(ws,"joinError",{message:"Bu o‘yin havolasi eskirgan. O‘qituvchidan yangi QR/havola oling."}); return; }
+    if(!game.id){send(ws,"joinError",{message:"Hozir faol o‘yin yo‘q. O‘qituvchidan yangi QR/havola oling."});return;}
     const name=String(m.name||"O‘quvchi").trim().slice(0,40); if(!name)return;
-    const id=uid("p"); game.players.set(id,{id,name,score:0,correct:0,wrong:0,answered:false,answerTime:null,streak:0});
-    ws.playerId=id; send(ws,"joined",{id,name}); broadcast();
+    const session=String(m.session||"").trim();
+    let existing=session? [...game.players.values()].find(p=>p.session===session):null;
+    if(existing){
+      existing.name=name; existing.connected=true; existing.disconnectedAt=null;
+      ws.playerId=existing.id; send(ws,"joined",{id:existing.id,name:existing.name,session:existing.session}); broadcast(); return;
+    }
+    const id=uid("p"), playerSession=session||uid("session");
+    game.players.set(id,{id,name,session:playerSession,score:0,correct:0,wrong:0,answered:false,answerTime:null,streak:0,connected:true,disconnectedAt:null});
+    ws.playerId=id; send(ws,"joined",{id,name,session:playerSession}); broadcast();
    }
    if(m.type==="answer"&&ws.playerId){
     const s=game.players.get(ws.playerId); if(!s||!game.running||s.answered)return;
-    s.answered=true;
-    const elapsed=Math.max(0,(Date.now()-game.startedAt)/1000); s.answerTime=elapsed;
+    const elapsed=Math.max(0,(Date.now()-game.startedAt)/1000);
+    if(elapsed>game.timeLimit){s.answered=true; broadcast(); return;}
+    s.answered=true; s.answerTime=elapsed;
     const q=game.question;
     if(q&&Number(m.answer)===q.answer){
       s.correct++;s.streak++;
@@ -62,8 +71,23 @@ wss.on("connection",ws=>{
    }
   }catch(e){}
  });
- ws.on("close",()=>{if(ws.playerId){game.players.delete(ws.playerId);broadcast()}})
+ ws.on("close",()=>{
+   if(ws.playerId){const s=game.players.get(ws.playerId); if(s){s.connected=false;s.disconnectedAt=Date.now();broadcast();}}
+ });
 });
+
+function startQuestion(){
+ if(!game.list.length)return false;
+ if(game.questionNo>=game.list.length){finishGame();return false;}
+ game.question=game.list[game.questionNo++]; game.running=true; game.startedAt=Date.now();
+ game.players.forEach(s=>{s.answered=false;s.answerTime=null;s.connected=!!s.connected});
+ broadcast(); return true;
+}
+function scheduleNextQuestion(){
+ if(game.advanceTimer)clearTimeout(game.advanceTimer);
+ game.running=false; game.question=null; broadcast();
+ game.advanceTimer=setTimeout(()=>{game.advanceTimer=null; startQuestion();},1800);
+}
 
 app.get("/api/state",(req,res)=>res.json(publicState()));
 app.get("/api/health",(req,res)=>res.json({ok:true,service:"Chemistry Race",time:new Date().toISOString()}));
@@ -148,18 +172,19 @@ app.post("/api/game/start",(req,res)=>{
  const list=ids.length?ids.map(id=>db.questions.find(q=>q.id===id)).filter(Boolean):db.questions.slice();
  if(!list.length)return res.status(400).json({error:"Savollar bazasi bo‘sh."});
  game.id=uid("game");game.title=String(req.body.title||db.settings.title);game.list=list;
- game.questionNo=0;game.total=list.length;game.timeLimit=Math.max(5,Math.min(180,Number(req.body.timeLimit)||20));
- game.running=false;game.question=null;game.players.clear();game.startedAt=0;broadcast();res.json({ok:true,total:list.length});
+ if(game.advanceTimer)clearTimeout(game.advanceTimer);
+ game.questionNo=0;game.total=list.length;game.timeLimit=Math.max(10,Math.min(180,Number(req.body.timeLimit)||30));
+ game.running=false;game.question=null;game.players.clear();game.startedAt=0;game.advanceTimer=null;broadcast();res.json({ok:true,total:list.length});
 });
 app.post("/api/game/next",(req,res)=>{
  if(!game.list.length)return res.status(400).json({error:"Avval yangi o‘yin yarating."});
+ if(game.advanceTimer){clearTimeout(game.advanceTimer);game.advanceTimer=null;}
  if(game.questionNo>=game.list.length){finishGame();return res.json({done:true})}
- game.question=game.list[game.questionNo++];game.running=true;game.startedAt=Date.now();
- game.players.forEach(s=>{s.answered=false;s.answerTime=null});broadcast();res.json({ok:true});
+ startQuestion(); res.json({ok:true});
 });
-app.post("/api/game/stop",(req,res)=>{game.running=false;broadcast();res.json({ok:true})});
+app.post("/api/game/stop",(req,res)=>{if(game.advanceTimer){clearTimeout(game.advanceTimer);game.advanceTimer=null;}game.running=false;broadcast();res.json({ok:true})});
 app.post("/api/game/clear-players",(req,res)=>{game.players.clear();broadcast();res.json({ok:true})});
-app.post("/api/game/reset",(req,res)=>{game.running=false;game.question=null;game.questionNo=0;game.total=0;game.list=[];game.players.clear();broadcast();res.json({ok:true})});
+app.post("/api/game/reset",(req,res)=>{if(game.advanceTimer){clearTimeout(game.advanceTimer);game.advanceTimer=null;}game.running=false;game.question=null;game.questionNo=0;game.total=0;game.list=[];game.players.clear();broadcast();res.json({ok:true})});
 
 app.post("/api/settings",(req,res)=>{
  db.settings={...db.settings,...req.body};db.settings.defaultTime=Math.max(5,Math.min(180,Number(db.settings.defaultTime)||20));
@@ -179,5 +204,13 @@ function finishGame(){
  }
  game.running=false;game.question=null;broadcast();
 }
-setInterval(()=>{if(game.running&&Date.now()-game.startedAt>(game.timeLimit+1)*1000){game.running=false;broadcast()}},500);
+setInterval(()=>{
+  if(game.running && Date.now()-game.startedAt >= game.timeLimit*1000){
+    if(game.questionNo>=game.total){ finishGame(); }
+    else { scheduleNextQuestion(); }
+  }
+  // Remove players who have been disconnected for more than 10 minutes.
+  const now=Date.now();
+  for(const [id,p] of game.players){if(!p.connected&&p.disconnectedAt&&now-p.disconnectedAt>10*60*1000)game.players.delete(id);}
+},250);
 const PORT=process.env.PORT||3000;server.listen(PORT,()=>console.log("CHEMISTRY RACE PRO: http://localhost:"+PORT));
